@@ -1,5 +1,6 @@
 services:
   skypiea-gateway:
+    container_name: skypiea-gateway
     build:
       context: .
       args:
@@ -47,6 +48,7 @@ services:
       retries: 10
 
   prometheus:
+    container_name: prometheus
     image: prom/prometheus
     volumes:
       - prometheus_data:/prometheus

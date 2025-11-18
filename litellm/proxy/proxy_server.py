@@ -980,6 +980,11 @@ try:
     )
     # print(f"mounted _next at {server_root_path}/ui/_next")
 
+    @app.get("/public")
+    async def redirect_public_to_ui():
+        """Redirect /public to /ui to maintain backward compatibility"""
+        return RedirectResponse(url="/ui", status_code=302)
+
     app.mount("/ui", StaticFiles(directory=ui_path, html=True), name="ui")
 
     # Handle HTML file restructuring

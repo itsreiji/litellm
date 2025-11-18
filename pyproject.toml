@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Skypiea Gateway"
+name = "litellm"
 version = "1.80.0"
 description = "Library to easily interface with LLM API providers"
 authors = ["SkypieaLabs"]
