@@ -1,4 +1,12 @@
+# -----------------------------------------------------------------
+# Docker Compose for litellm (Portainer friendly)
+# -----------------------------------------------------------------
+# The original `db` service is commented out because you use Supabase.
+# Keep it here for reference / quick re‑enable during local testing.
+# -----------------------------------------------------------------
+
 services:
+  # Litellm gateway (proxy)
   skypiea-gateway:
     container_name: skypiea-gateway
     build:
@@ -6,14 +14,11 @@ services:
       args:
         target: runtime
     image: ghcr.io/itsreiji/litellm:latest
-    #########################################
-    ## Uncomment these lines to start proxy with a config.yaml file ##
+    # Uncomment the lines below if you want to mount a custom config file
     volumes:
-     - ./proxy_server_config.yaml:/app/proxy_server_config.yaml
+      - ./proxy_server_config.yaml:/app/proxy_server_config.yaml
     command:
-     - "--config=/app/proxy_server_config.yaml"
-    ##############################################
-
+      - "--config=/app/proxy_server_config.yaml"
     environment:
       - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
       - LITELLM_SALT_KEY=${LITELLM_SALT_KEY}
@@ -21,29 +26,40 @@ services:
       - STORE_MODEL_IN_DB=${STORE_MODEL_IN_DB}
       - UI_USERNAME=${UI_USERNAME}
       - UI_PASSWORD=${UI_PASSWORD}
-    retries: 3     # Retry up to 3 times if health check fails
-    start_period: 40s  # Wait 40 seconds after container start before beginning health checks
+    restart: unless-stopped
 
-  db:
-    image: postgres:18
-    restart: always
-    container_name: litellm_db
-    environment:
-      POSTGRES_DB: litellm
-      POSTGRES_USER: llmproxy
-      POSTGRES_PASSWORD: dbpassword9090
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data # Persists Postgres data across container restarts
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
-      interval: 1s
-      timeout: 5s
-      retries: 10
-
+  # Prometheus monitoring (optional)
   prometheus:
+    image: prom/prometheus:latest
     container_name: prometheus
-    driver: local
+    volumes:
+      - prometheus_data:/prometheus
+    restart: unless-stopped
+
+# -----------------------------------------------------------------
+# Disabled internal Postgres (use Supabase instead)
+# -----------------------------------------------------------------
+#  db:
+#    image: postgres:18
+#    restart: always
+#    container_name: litellm_db
+#    environment:
+#      POSTGRES_DB: litellm
+#      POSTGRES_USER: llmproxy
+#      POSTGRES_PASSWORD: dbpassword9090
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data # Persists Postgres data across container restarts
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
+#      interval: 1s
+#      timeout: 5s
+#      retries: 10
+
+volumes:
+  # Volume kept for compatibility – not used when you run Supabase externally
   postgres_data:
-    name: litellm_postgres_data # Named volume for Postgres data persistence
+    name: litellm_postgres_data
+  prometheus_data:
+    driver: local
