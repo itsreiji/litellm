@@ -16,7 +16,7 @@ services:
     image: ghcr.io/itsreiji/litellm:latest
     # Uncomment the lines below if you want to mount a custom config file
     volumes:
-      - ./proxy_server_config.yaml:/app/proxy_server_config.yaml
+      - ${PWD}/proxy_server_config.yaml:/app/proxy_server_config.yaml
     command:
       - "--config=/app/proxy_server_config.yaml"
     environment:
