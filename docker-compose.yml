@@ -14,8 +14,6 @@ services:
       args:
         target: runtime
     image: ghcr.io/itsreiji/skypiea-gateway:latest
-    # volumes:
-    #   - ${PWD}/proxy_server_config.yaml:/app/proxy_server_config.yaml
     command:
       - "--config=/app/proxy_server_config.yaml"
     environment:
