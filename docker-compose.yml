@@ -13,7 +13,7 @@ services:
       context: .
       args:
         target: runtime
-    image: ghcr.io/itsreiji/skypiea-gateway:latest
+    image: itsreiji/skypiea-gateway:latest
     # command:
     #   - "--config=/app/proxy_server_config.yaml"
     ports:
